@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Intern Login</title>
+    <link rel="stylesheet" href="/static/style.css" />
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f2f5fc;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .login-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+
+        .login-container h2 {
+            text-align: center;
+            color: #2f5db8;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.5rem;
+            margin: 0.5rem 0;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            font-size: 1rem;
+        }
+
+        button {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: #2f5db8;
+            border: none;
+            border-radius: 200px;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 1rem;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background-color: #1e3a8a;
+        }
+
+        .error-msg {
+            color: red;
+            margin-top: 0.5rem;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login-container">
+        <h2>Intern Login</h2>
+
+        <form id="login-form">
+            <label for="internId">Intern ID</label>
+            <input type="text" id="internId" name="internId" placeholder="e.g. INT001" required />
+
+            <label for="email">Email Address</label>
+            <input type="email" id="email" name="email" placeholder="example@example.com" required />
+
+            <button type="submit">Login</button>
+        </form>
+
+        <div class="error-msg" id="error-msg"></div>
+    </div>
+
+    <script>
+        document.getElementById('login-form').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const internId = document.getElementById('internId').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const errorMsg = document.getElementById('error-msg');
+
+            if (internId === '' || email === '') {
+                errorMsg.textContent = 'Please fill in all fields.';
+                return;
+            }
+
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                errorMsg.textContent = 'Please enter a valid email address.';
+                return;
+            }
+
+            try {
+                const res = await fetch(`/api/intern/${internId}`);
+                if (res.ok) {
+                    const intern = await res.json();
+                    if (intern && intern.email === email) {
+                        window.location.href = `/index.html?internId=${internId}`;
+                        return;
+                    }
+                }
+
+                errorMsg.textContent = 'Invalid Intern ID or Email.';
+            } catch (err) {
+                errorMsg.textContent = 'Server error. Please try again later.';
+                console.error(err);
+            }
+        });
+    </script>
+</body>
+
+</html>
